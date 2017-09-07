@@ -1,6 +1,32 @@
+#!/usr/bin/python
+
+# Copyright (c) 2017) Gavin Chan
+#
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+#
 import argparse
 
-# Define cs_Interface class
 class cs_Interface:
     ident = ""
     desc = ""
@@ -12,6 +38,7 @@ class cs_Interface:
     no_shut = True
     sw_mode = ""
     vlan = ""
+    portsec = False
 
     def __init__(self, id):
         self.ident = id
@@ -63,6 +90,8 @@ class cs_Interface:
         self.desc = desc
 
     def conf_encap(self, encap):
+        # Set encapsulation mode on interface, e.g. dot1q, ppp
+        # encapsulation: "dot1q" will utilize VLAN number if specified
         self.encap = encap
 
     def add_ipv6(self, ipv6):
@@ -74,22 +103,32 @@ class cs_Interface:
         self.linklocal = llocal
 
     def conf_access(self):
+        # Configure switchport mode access
         self.sw_mode = "access"
 
     def conf_native(self):
+        # Configure switchport mode native
         self.sw_mode = "native"
 
     def conf_trunk(self):
+        # Configure switchport mode trunk
         self.sw_mode = "trunk"
 
     def conf_vlan(self, vlan):
+        # Configure VLAN number to be used with other options
         self.vlan = vlan
+
+    def conf_portsec(self):
+        # Enable port-security
+        self.sw_mode = "access"
+        self.portsec = True
 
     def no_shut(self, enable):
         # Sets port status (default enable=true)
         self.no_shut = enable
 
     def output(self):
+        # Generate output
         out_str = "interface {}\n".format(self.ident)
         if self.desc:
             out_str += " description {}\n".format(self.desc)
@@ -121,6 +160,7 @@ class cs_Interface:
             out_str += " shutdown\n"
         return out_str
 
+# Main
 parser = argparse.ArgumentParser(description="Generator utility for Cisco IOS interface configuration")
 parser.add_argument("interface", help="Interface")
 parser.add_argument("-d", "--desc", help="Description")
@@ -131,6 +171,7 @@ parser.add_argument("-l", "--llocal", help="IPv6 link-local address", type=str)
 parser.add_argument("-m", "--netmask", help="Specify IPv4 netmask instead of CIDR", type=str)
 parser.add_argument("-sA", "--access", help="Switchport mode access; use with -v to specify VLAN", action="store_true")
 parser.add_argument("-sN", "--native", help="Switchport mode trunk; use with -v to specify VLAN", action="store_true")
+parser.add_argument("-sP", "--portsec", help="Switchport port-security; enforces switchport mode access", action="store_true")
 parser.add_argument("-sT", "--trunk", help="Switchport mode trunk", action="store_true")
 parser.add_argument("-v", "--vlan", help="VLAN number; use with -a,-n,-e dot1q", type=str)
 parser.add_argument("-X", "--shutdown", help="Shutdown interface (default: no shutdown)", action="store_true")
@@ -144,15 +185,14 @@ if args.ipv4:
     cs_int.add_ipv4(args.ipv4)
 
     if args.netmask:
-        # Use given netmask if specified
+        # Use given netmask if specified; overwrites CIDR
         cs_int.add_mask(args.netmask)
-else:
-    cs_int = cs_Interface(args.interface)
 
 if args.desc:
     # Add description to interface
     cs_int.add_desc(args.desc)
 if args.encap:
+    # Set encapsulation mode
     cs_int.conf_encap(args.encap)
 if args.ipv6:
     # Add IPv6 address
@@ -174,6 +214,11 @@ if args.trunk:
 if args.vlan:
     # Configure switchport mode access vlan
     cs_int.conf_vlan(args.vlan)
+
+# Switchport port security
+if args.portsec:
+    # Enable port-security
+    cs_int.conf_portsec()
 if args.shutdown:
     # Explicitly shutdown port
     cs_int.no_shut(False)
