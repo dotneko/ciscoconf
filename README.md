@@ -5,18 +5,51 @@ This project consists of a collection of python tools that can be used for auto-
 
 Utilities include:
 
+- `csinit.py`: device initialization tool
 - `csint.py`: interface configuration tool
 
+# csinit.py
+
+Generator utility for Cisco IOS device initial configuration
+
+```
+usage: csinit.py [-h] [-d DOMAIN] [-l LOGIN] [-t] [-s] [-x6] [-K]
+                 hostname console_pass enable_pass
+```
+
+Positional arguments:
+
+```
+  hostname              Hostname
+  console_pass          Console Password
+  enable_pass           Enable Secret
+```
+
+Optional arguments:
+
+```
+  -h, --help            show this help message and exit
+  -d DOMAIN, --domain DOMAIN
+                        Domain Name
+  -l LOGIN, --login LOGIN
+                        Login Credentials - username:password
+  -t, --telnet          Enable Telnet; use -l username:password
+  -s, --ssh             Enable SSH; use -l username:password
+  -x6, --noipv6         Disable IPv6 unicast-routing
+  -K, --packettracer    Packet Tracer syntax for key generation
+```
+
 # csint.py
+
+Generator utility for Cisco IOS interface configuration
 
 ```
 usage: csint.py [-h] [options] interface
 ```
 
-**Generator utility for Cisco IOS interface configuration**
+Optional arguments:
 
 ```
-optional arguments:
   -h, --help            show this help message and exit
   -d DESC, --desc DESC  Description
   -e ENCAP, --encap ENCAP
@@ -32,7 +65,7 @@ optional arguments:
   -sT, --trunk          Switchport mode trunk
   -v VLAN, --vlan VLAN  VLAN number; use with -a,-n,-e dot1q
   -X, --shutdown        Shutdown interface (default: no shutdown)
-  -x, --exit            Add exit to end of interface configurationositional arguments:
+  -x, --exit            Add exit to end of interface configuration
 ```
 
 ### Examples:
@@ -72,3 +105,6 @@ interface lo1
 ```
 csint.py "range g0/2-24" -sA -v 20
 ```
+
+# csinit.py
+
