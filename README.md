@@ -33,3 +33,35 @@ optional arguments:
   -s, --shutdown        Shutdown interface (default: no shutdown)
   -x, --exit            Add exit to end of interface configuration
 ```
+
+##### Examples:
+
+**Interface g0/1 with IPv4 address using CIDR or dotted decimal notation:**
+
+```
+csint.py g0/1 -4 172.16.0.1/24
+csint.py g0/1 -4 172.16.0.1 255.255.255.0
+```
+
+Will generate:
+
+```
+interface g0/1
+ ip address 172.16.0.1 255.255.255.240
+ no shutdown
+```
+
+**Interface lo1 with IPv6 address:**
+
+```
+csint.py lo1 -6 2001:db8:cafe:a::1/64 -l fe80::1
+```
+
+Will generate:
+
+```
+interface lo1
+ ipv6 address 2001:db8:cafe:a::1/64
+ ipv6 address fe80::1 link-local
+ no shutdown
+```
