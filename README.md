@@ -7,34 +7,35 @@ Utilities include:
 
 - `csint.py`: interface configuration tool
 
-### csint.py
+# csint.py
 
 ```
-usage: csint.py [-h] [-d DESC] [-4 IPV4] [-6 IPV6] [-l LLOCAL] [-m NETMASK]
-                [-s] [-x]
-                interface
+usage: csint.py [-h] [options] interface
 ```
 
 **Generator utility for Cisco IOS interface configuration**
 
 ```
-positional arguments:
-  interface             Interface
-
 optional arguments:
   -h, --help            show this help message and exit
   -d DESC, --desc DESC  Description
+  -e ENCAP, --encap ENCAP
+                        Encapsulation mode; can use with -v
   -4 IPV4, --ipv4 IPV4  IPv4 address/CIDR
   -6 IPV6, --ipv6 IPV6  IPv6 address/CIDR
   -l LLOCAL, --llocal LLOCAL
                         IPv6 link-local address
   -m NETMASK, --netmask NETMASK
-                        Add dotted decimal IPv4 netmask
-  -s, --shutdown        Shutdown interface (default: no shutdown)
-  -x, --exit            Add exit to end of interface configuration
+                        Specify IPv4 netmask instead of CIDR
+  -sA, --access         Switchport mode access; use with -v to specify VLAN
+  -sN, --native         Switchport mode trunk; use with -v to specify VLAN
+  -sT, --trunk          Switchport mode trunk
+  -v VLAN, --vlan VLAN  VLAN number; use with -a,-n,-e dot1q
+  -X, --shutdown        Shutdown interface (default: no shutdown)
+  -x, --exit            Add exit to end of interface configurationositional arguments:
 ```
 
-##### Examples:
+### Examples:
 
 **Interface g0/1 with IPv4 address using CIDR or dotted decimal notation:**
 
@@ -64,4 +65,10 @@ interface lo1
  ipv6 address 2001:db8:cafe:a::1/64
  ipv6 address fe80::1 link-local
  no shutdown
+```
+
+**Interface range configured with switchport access VLAN:**
+
+```
+csint.py "range g0/2-24" -sA -v 20
 ```
