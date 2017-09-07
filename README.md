@@ -105,6 +105,3 @@ interface lo1
 ```
 csint.py "range g0/2-24" -sA -v 20
 ```
-
-# csinit.py
-

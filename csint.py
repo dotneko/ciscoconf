@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2017) Gavin Chan
+# Copyright (c) 2017 Gavin Chan
 #
 # All rights reserved.
 #
